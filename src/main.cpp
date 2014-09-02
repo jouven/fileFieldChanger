@@ -11,7 +11,6 @@
  * remember to wrap you values in quotes if there are white spaces so they don't get ignored
  * the main will return 0 if it hasn't managed to change anything and 1 otherwise
  * it has some error control for missing arguments but don't expect much
- * right now it always verbose the arguments passed and ignored commented lines
  * it will abort if it finds invalid UTF-8 encoding
  * libraries required: GCC version that supports C++11, BOOST and UTF8-CPP
  * */

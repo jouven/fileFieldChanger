@@ -19,14 +19,13 @@
 #include <fstream>
 #include "utf8.h"
 #include "boost/algorithm/string.hpp"
-#include <map>
-
-typedef std::pair<std::string, std::string> pairstrstr;
+#include <unordered_map>
 
 int main(int argc, char** argv)
 {
+	typedef std::pair<std::string, std::string> pairstrstr;
 	//dictionary of parameters
-	std::map<std::string, std::string> params;
+	std::unordered_map<std::string, std::string> params;
 
 	std::string filepath;
 	std::string commentchar;
@@ -42,7 +41,6 @@ int main(int argc, char** argv)
 			{
 				filepath = std::string(argv[i + 1]);
 				continue;
-
 			}
 			if (argtmp == "-c")
 			{
@@ -64,8 +62,8 @@ int main(int argc, char** argv)
 				if (i + 2 < argc && argv[i + 2] != nullptr)
 				{
 					params.insert(
-							pairstrstr(std::string(argv[i + 1]),
-									std::string(argv[i + 2])));
+					    pairstrstr(std::string(argv[i + 1]),
+					               std::string(argv[i + 2])));
 				}
 			}
 		}
@@ -77,7 +75,7 @@ int main(int argc, char** argv)
 		for (auto i = params.begin(); i != params.end(); i = std::next(i))
 		{
 			std::cout << "key " + i->first << " value " << i->second
-					<< std::endl;
+			          << std::endl;
 		}
 	}
 	//for debug purposes
@@ -90,19 +88,23 @@ int main(int argc, char** argv)
 	//check that all the necessary arguments have been passed
 	if (filepath.empty())
 	{
-		std::cout << u8R"(No path "-p" parameter specified)" << std::endl;
+		std::cout << R"(No path "-p" parameter specified)" << std::endl;
 		return 0;
 	}
 
 	if (commentchar.empty())
 	{
-		std::cout << u8R"(No comment character "-c" parameter specified, this parameter might need to be wrapped in quote characters)" << std::endl;
+		std::cout <<
+		          R"(No comment character "-c" parameter specified, this parameter might need to be wrapped in quote characters)"
+		          << std::endl;
 		return 0;
 	}
 
 	if (separatorchar.empty())
 	{
-		std::cout << u8R"(No separator character "-s" parameter specified, this parameter might need to be wrapped in quote characters)" << std::endl;
+		std::cout <<
+		          R"(No separator character "-s" parameter specified, this parameter might need to be wrapped in quote characters)"
+		          << std::endl;
 		return 0;
 	}
 
@@ -136,9 +138,9 @@ int main(int argc, char** argv)
 		if (end_it != line.end())
 		{
 			std::cout << "Invalid UTF-8 encoding detected at line "
-					<< line_count << "\n";
+			          << line_count << "\n";
 			std::cout << "This part is fine: "
-					<< std::string(line.begin(), end_it) << "\n";
+			          << std::string(line.begin(), end_it) << "\n";
 			std::cout << "Quitting...";
 			std::remove((filepath + ".tmp").data());
 			break;
@@ -146,6 +148,7 @@ int main(int argc, char** argv)
 		//bool to control if the line is just a comment
 		auto commentedline = false;
 		//iterate the characters of the line until it finds a non whitespace-comment character
+
 		for (auto it = line.begin(); it != line.end(); it = std::next(it))
 		{
 			//ignore trailing spaces
@@ -159,7 +162,7 @@ int main(int argc, char** argv)
 				if (verbose)
 				{
 					std::cout << "Commented line " << line_count
-							<< " ignoring line" << std::endl;
+					          << " ignoring line" << std::endl;
 				}
 				commentedline = true;
 				break;
@@ -178,15 +181,15 @@ int main(int argc, char** argv)
 		//rest of elements == comments
 		std::vector<std::string> stringvectorcomm;
 		boost::algorithm::split(stringvectorcomm, line,
-				boost::algorithm::is_any_of(commentchar),
-				boost::algorithm::token_compress_on);
+		                        boost::algorithm::is_any_of(commentchar),
+		                        boost::algorithm::token_compress_on);
 		//split the first element of stringvectorcomm with the separator character
 		//first element == key
 		//second element == value , even if the value has spaces-"more separator characters within" doesn't matter because it discards the rest
 		std::vector<std::string> stringvectorsep;
 		boost::algorithm::split(stringvectorsep, stringvectorcomm.front(),
-				boost::algorithm::is_any_of(separatorchar),
-				boost::algorithm::token_compress_on);
+		                        boost::algorithm::is_any_of(separatorchar),
+		                        boost::algorithm::token_compress_on);
 		//iterate the vector with the config data trying to find a config with some key we want to change
 		auto itstr = stringvectorsep.begin();
 		bool change = false;
@@ -194,7 +197,7 @@ int main(int argc, char** argv)
 		{
 			//iterate the params in the dictionary
 			for (auto itarg = params.begin(); itarg != params.end(); itarg =
-					std::next(itarg))
+			         std::next(itarg))
 			{
 				//if the current one matches
 				if (*itstr == itarg->first)
@@ -226,7 +229,7 @@ int main(int argc, char** argv)
 		{
 			//get the config data until the change and put it on the modified line, linestrtmp, variable
 			for (auto ittmp = stringvectorsep.begin(); ittmp != itstr; ittmp =
-					std::next(ittmp))
+			         std::next(ittmp))
 			{
 				if (!(*ittmp).empty())
 				{
@@ -240,8 +243,8 @@ int main(int argc, char** argv)
 			if (stringvectorcomm.size() > 1)
 			{
 				for (auto ittmp = std::next(stringvectorcomm.begin());
-						ittmp != stringvectorcomm.end();
-						ittmp = std::next(ittmp))
+				     ittmp != stringvectorcomm.end();
+				     ittmp = std::next(ittmp))
 				{
 					linestrtmp += commentchar + *ittmp;
 				}

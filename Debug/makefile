@@ -44,7 +44,7 @@ all: ffc
 ffc: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: Cross G++ Linker'
-	g++  -o "ffc" $(OBJS) $(USER_OBJS) $(LIBS)
+	g++ -L/home/jouven/mylibs/debug -Xlinker -rpath=/home/jouven/mylibs/debug/ -o "ffc" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

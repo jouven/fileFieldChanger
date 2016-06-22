@@ -1,0 +1,10 @@
+.cproject
+.externalToolBuilders/
+.project
+.settings/
+Debug/ffc
+Debug/src/main.d
+Debug/src/main.o
+Release/ffc
+Release/src/main.d
+Release/src/main.o

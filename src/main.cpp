@@ -1,4 +1,4 @@
-/*
+/* FileFieldChanger
  * commandline program
  * can be used to modify config files like the one for ssh (sshd_config)
  * the program will attempt to modify the config values i.e Port 22 --> Port 2222
@@ -15,15 +15,16 @@
  * libraries required: GCC version that supports C++11, BOOST and UTF8-CPP
  * */
 
-#include <iostream>
-#include <fstream>
 #include "utf8.h"
 #include "boost/algorithm/string.hpp"
+
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 int main(int argc, char** argv)
 {
-	typedef std::pair<std::string, std::string> pairstrstr;
 	//dictionary of parameters
 	std::unordered_map<std::string, std::string> params;
 
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
 	for (auto i = 1; i < argc; i++)
 	{
 		std::string argtmp(argv[i]);
-		if (i + 1 < argc && argv[i + 1] != nullptr)
+		if (i + 1 < argc and argv[i + 1] != nullptr)
 		{
 			if (argtmp == "-p")
 			{
@@ -59,11 +60,12 @@ int main(int argc, char** argv)
 			if (argtmp == "-a")
 			{
 				//insert the pair into the params dictionary
-				if (i + 2 < argc && argv[i + 2] != nullptr)
+				if (i + 2 < argc and argv[i + 2] != nullptr)
 				{
-					params.insert(
-					    pairstrstr(std::string(argv[i + 1]),
-					               std::string(argv[i + 2])));
+					params.emplace(
+					    std::string(argv[i + 1])
+					    , std::string(argv[i + 2])
+					);
 				}
 			}
 		}
@@ -72,9 +74,9 @@ int main(int argc, char** argv)
 	if (verbose)
 	{
 		std::cout << " argc " << argc << std::endl;
-		for (auto i = params.begin(); i != params.end(); i = std::next(i))
+		for (const auto& pairItem : params)
 		{
-			std::cout << "key " + i->first << " value " << i->second
+			std::cout << "key " + pairItem.first << " value " << pairItem.second
 			          << std::endl;
 		}
 	}
@@ -110,7 +112,7 @@ int main(int argc, char** argv)
 
 	//open the file
 	std::ifstream file(filepath);
-	if (!file.is_open())
+	if (not file.is_open())
 	{
 		std::cout << "Could not open " << filepath << std::endl;
 		return 0;
@@ -118,7 +120,7 @@ int main(int argc, char** argv)
 	//create the new modified temporal file
 	std::ofstream newFile(filepath + ".tmp");
 	//line counter
-	unsigned int line_count = 0;
+	uint_fast32_t line_count = 0;
 	//string to get the lines with getline
 	std::string line;
 	//"global" variable to control if a change has happened
@@ -149,15 +151,15 @@ int main(int argc, char** argv)
 		auto commentedline = false;
 		//iterate the characters of the line until it finds a non whitespace-comment character
 
-		for (auto it = line.begin(); it != line.end(); it = std::next(it))
+		for (const auto chara : line)
 		{
 			//ignore trailing spaces
-			if (*it == ' ')
+			if (chara == ' ')
 			{
 				continue;
 			}
 			//if it finds a comment character take notice
-			if (*it == commentchar.front())
+			if (chara == commentchar.front())
 			{
 				if (verbose)
 				{
@@ -196,18 +198,17 @@ int main(int argc, char** argv)
 		while (itstr != stringvectorsep.end())
 		{
 			//iterate the params in the dictionary
-			for (auto itarg = params.begin(); itarg != params.end(); itarg =
-			         std::next(itarg))
+			for (const auto& itarg : params)
 			{
 				//if the current one matches
-				if (*itstr == itarg->first)
+				if (*itstr == itarg.first)
 				{
 					//get the next, which is the value we want to change
 					itstr = std::next(itstr);
 					if (itstr != stringvectorsep.end())
 					{
 						//change it
-						*itstr = itarg->second;
+						*itstr = itarg.second;
 						//take notice
 						change = true;
 						//if a changed happened skip the rest of the dictionary
@@ -231,7 +232,7 @@ int main(int argc, char** argv)
 			for (auto ittmp = stringvectorsep.begin(); ittmp != itstr; ittmp =
 			         std::next(ittmp))
 			{
-				if (!(*ittmp).empty())
+				if (not (*ittmp).empty())
 				{
 					linestrtmp += *ittmp + separatorchar;
 				}
